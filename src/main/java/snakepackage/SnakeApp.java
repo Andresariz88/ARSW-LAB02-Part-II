@@ -40,6 +40,8 @@ public class SnakeApp {
     int nr_selected = 0;
     Thread[] thread = new Thread[MAX_THREADS];
 
+    private static int deadFirst;
+
     public SnakeApp() {
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         frame = new JFrame("The Snake Race");
@@ -57,8 +59,8 @@ public class SnakeApp {
         
         JPanel actionsBPabel=new JPanel();
         actionsBPabel.setLayout(new FlowLayout());
-        JButton botonPausa = new JButton("Resume");
-        botonPausa.addActionListener(new ActionListener(){
+        JButton resumeButton = new JButton("Resume");
+        resumeButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 synchronized (Board.gameboard) {
@@ -71,7 +73,23 @@ public class SnakeApp {
                 }
             }
         });
-        actionsBPabel.add(botonPausa);
+        actionsBPabel.add(resumeButton);
+        JButton pauseButton = new JButton("Pause");
+        pauseButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                synchronized (Board.gameboard) {
+                    if (!snakes[0].isPaused()) {
+                        for (Snake sn : snakes) {
+                            sn.setPaused(true);
+                            System.out.println(deadFirst);
+                        }
+                        Board.gameboard.notifyAll();
+                    }
+                }
+            }
+        });
+        actionsBPabel.add(pauseButton);
         frame.add(actionsBPabel,BorderLayout.SOUTH);
 
     }
@@ -101,6 +119,9 @@ public class SnakeApp {
             for (int i = 0; i != MAX_THREADS; i++) {
                 if (snakes[i].isSnakeEnd() == true) {
                     x++;
+                    if (x == 1) {
+                        deadFirst = snakes[i].getIdt();
+                    }
                 }
             }
             if (x == MAX_THREADS) {
@@ -121,4 +142,7 @@ public class SnakeApp {
         return app;
     }
 
+    public int getDeadFirst() {
+        return deadFirst;
+    }
 }
