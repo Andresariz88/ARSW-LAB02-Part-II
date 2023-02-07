@@ -8,6 +8,8 @@ import javax.swing.JFrame;
 import enums.GridSize;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
@@ -55,7 +57,21 @@ public class SnakeApp {
         
         JPanel actionsBPabel=new JPanel();
         actionsBPabel.setLayout(new FlowLayout());
-        actionsBPabel.add(new JButton("Action "));
+        JButton botonPausa = new JButton("Resume");
+        botonPausa.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                synchronized (Board.gameboard) {
+                    if (snakes[0].isPaused()) {
+                        for (Snake sn : snakes) {
+                            sn.setPaused(false);
+                        }
+                        Board.gameboard.notifyAll();
+                    }
+                }
+            }
+        });
+        actionsBPabel.add(botonPausa);
         frame.add(actionsBPabel,BorderLayout.SOUTH);
 
     }

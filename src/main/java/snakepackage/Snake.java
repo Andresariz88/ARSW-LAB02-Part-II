@@ -26,6 +26,7 @@ public class Snake extends Observable implements Runnable {
     private boolean isSelected = false;
     private int growing = 0;
     public boolean goal = false;
+    private boolean paused = true;
 
     public Snake(int idt, Cell head, int direction) {
         this.idt = idt;
@@ -48,7 +49,7 @@ public class Snake extends Observable implements Runnable {
     @Override
     public void run() {
         while (!snakeEnd) {
-            
+
             snakeCalc();
 
             //NOTIFY CHANGES TO GUI
@@ -65,11 +66,19 @@ public class Snake extends Observable implements Runnable {
                 e.printStackTrace();
             }
 
+            if (paused) {
+                try {
+                    synchronized (Board.gameboard) {
+                        Board.gameboard.wait();
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
-        
+
         fixDirection(head);
-        
-        
+
     }
 
     private void snakeCalc() {
@@ -160,7 +169,6 @@ public class Snake extends Observable implements Runnable {
                     Board.turbo_boosts[i] = new Cell(-5, -5);
                     hasTurbo = true;
                 }
-
             }
             System.out.println("[" + idt + "] " + "GETTING TURBO BOOST "
                     + newCell.toString());
@@ -343,4 +351,11 @@ public class Snake extends Observable implements Runnable {
         return idt;
     }
 
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+    }
 }
