@@ -3,7 +3,7 @@ package snakepackage;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 import enums.GridSize;
 import java.awt.BorderLayout;
@@ -12,8 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JButton;
-import javax.swing.JPanel;
 
 /**
  * @author jd-
@@ -40,6 +38,10 @@ public class SnakeApp {
     int nr_selected = 0;
     Thread[] thread = new Thread[MAX_THREADS];
 
+    private int deadFirst = 0;
+
+    private int longestSnake;
+
     public SnakeApp() {
         Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         frame = new JFrame("The Snake Race");
@@ -47,7 +49,7 @@ public class SnakeApp {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // frame.setSize(618, 640);
         frame.setSize(GridSize.GRID_WIDTH * GridSize.WIDTH_BOX + 17,
-                GridSize.GRID_HEIGHT * GridSize.HEIGH_BOX + 40);
+                GridSize.GRID_HEIGHT * GridSize.HEIGH_BOX + 40 + 80);
         frame.setLocation(dimension.width / 2 - frame.getWidth() / 2,
                 dimension.height / 2 - frame.getHeight() / 2);
         board = new Board();
@@ -57,8 +59,8 @@ public class SnakeApp {
         
         JPanel actionsBPabel=new JPanel();
         actionsBPabel.setLayout(new FlowLayout());
-        JButton botonPausa = new JButton("Resume");
-        botonPausa.addActionListener(new ActionListener(){
+        JButton startButton = new JButton("Start");
+        startButton.addActionListener(new ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
                 synchronized (Board.gameboard) {
@@ -71,7 +73,37 @@ public class SnakeApp {
                 }
             }
         });
-        actionsBPabel.add(botonPausa);
+        actionsBPabel.add(startButton);
+        JButton resumeButton = new JButton("Resume");
+        resumeButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                synchronized (Board.gameboard) {
+                    if (snakes[0].isPaused()) {
+                        for (Snake sn : snakes) {
+                            sn.setPaused(false);
+                        }
+                        Board.gameboard.notifyAll();
+                    }
+                }
+            }
+        });
+        actionsBPabel.add(resumeButton);
+        JButton pauseButton = new JButton("Pause");
+        pauseButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                synchronized (Board.gameboard) {
+                    if (!snakes[0].isPaused()) {
+                        for (Snake sn : snakes) {
+                            sn.setPaused(true);
+                        }
+                        Board.gameboard.notifyAll();
+                    }
+                }
+            }
+        });
+        actionsBPabel.add(pauseButton);
         frame.add(actionsBPabel,BorderLayout.SOUTH);
 
     }
@@ -101,6 +133,9 @@ public class SnakeApp {
             for (int i = 0; i != MAX_THREADS; i++) {
                 if (snakes[i].isSnakeEnd() == true) {
                     x++;
+                    if (deadFirst == 0) {
+                        deadFirst = snakes[i].getIdt();
+                    }
                 }
             }
             if (x == MAX_THREADS) {
@@ -121,4 +156,22 @@ public class SnakeApp {
         return app;
     }
 
+    public void longestSnake() {
+        int max = 3;
+        for (Snake sn: snakes) {
+            if (sn.getBody().size() > max && !sn.isSnakeEnd()) {
+                max = sn.getBody().size();
+                longestSnake = sn.getIdt();
+            }
+        }
+    }
+
+    public int getLongestSnake() {
+        longestSnake();
+        return longestSnake;
+    }
+
+    public int getDeadFirst() {
+        return deadFirst;
+    }
 }

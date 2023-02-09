@@ -113,6 +113,7 @@ public class Board extends JLabel implements Observer {
 		drawBarriers(g);
 		drawJumpPads(g);
 		drawTurboBoosts(g);
+		drawInformation(g);
 	}
 
 	private void drawTurboBoosts(Graphics g) {
@@ -220,6 +221,17 @@ public class Board extends JLabel implements Observer {
 				* GridSize.HEIGH_BOX; i += GridSize.HEIGH_BOX) {
 			g.drawLine(0, i, GridSize.GRID_WIDTH * GridSize.WIDTH_BOX, i);
 		}
+
+	}
+
+	public void drawInformation(Graphics g) {
+		//if (SnakeApp.getApp().snakes[1].isPaused()) {
+			g.setColor(new Color(238, 238, 238));
+			g.fillRect(50, 604, 200, 50);
+			g.setColor(new Color(0, 0, 40));
+			g.drawString("Longest snake: " + SnakeApp.getApp().getLongestSnake(), 150, 614);
+			g.drawString("First snake dead: " + SnakeApp.getApp().getDeadFirst(), 350, 614);
+		//}
 
 	}
 
