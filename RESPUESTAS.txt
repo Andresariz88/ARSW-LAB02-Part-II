@@ -1,10 +1,10 @@
 2. De acuerdo con lo anterior, y con la lógica del juego, identifique y escriba claramente (archivo RESPUESTAS.txt):
     - Posibles condiciones de carrera.
-      En dónde están los cuerpos de las diferentes serpientes.
+      Cuando dos Snakes se mueven al mismo lugar, no se sabe cual de las dos va a acceder al tablero (Cells) primero.
 
     - Uso inadecuado de colecciones, considerando su manejo concurrente (para esto, aumente la velocidad del juego y ejecútelo varias veces hasta que se genere un error).
-      Las Listas de Cells correspondientes a los cuerpos de las Snakes, ya que puede darse el caso en el que dos Snakes (hilos) diferentes accedan a una misma Cell a la vez,
-      en el caso en el que una esté encima de otra, y ocurra una ConcurrentModificationException.
+      Las Listas de Cells correspondientes a los cuerpos de las Snakes, ya que el JLabel Board accede a estos para pintar correctamente el juego. Y cuando la serpiente se
+      mueve esta modifica la Lista de Cells y ocurre una ConcurrentModificationException. en el JLabel.
 
     - Uso innecesario de esperas activas.
       Las Snakes esperan activamente a ver si tomaron un potenciador.
@@ -12,3 +12,5 @@
 3. Identifique las regiones críticas asociadas a las condiciones de carrera, y haga algo para eliminarlas. Tenga en
    cuenta que se debe sincronizar estrictamente LO NECESARIO. En su documento de respuestas, indique la solución realizada
    para cada ítem del punto 2. Igualmente, tenga en cuenta que en los siguientes puntos NO se deben agregar más posibles condiciones de carrera.
+    - Cuando una Snake se mueve, tiene que buscar la última celda del tablero de celdas y dejarla libre. El Label accede a el body de la serpiente para pintarla. Hay que
+      sincronizar estos dos pedazos para que no accedan al mismo tiempo y no ocurra la excepción.
